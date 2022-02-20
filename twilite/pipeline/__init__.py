@@ -1,5 +1,4 @@
 import seaborn as sns
-from twilite.clustering import Cluster
 
 
 class Pipeline:
@@ -13,14 +12,17 @@ class Pipeline:
     def fit(self, data):
         self.preprocess.read_df(data)
         self.preprocess.filter()
-        mat, id = self.preprocess.sparse()
+        mat, _id = self.preprocess.sparse()
         self.transform.X = mat
-        self.transform.author_ids = id
+        self.transform.author_ids = _id
         self.transform.rescale()
         df = self.transform.projection()
         self.model = self.evaluate.evaluate(df=df)
-        cluster = Cluster(df, self.model)
-        self.results = cluster.fit()
+        arr = df[['xcord', 'ycord']].to_numpy()
+        model = self.model.clustering(self.model.parameter)
+        labels = model.fit_predict(arr)
+        df['label'] = labels
+        self.results = df
         return None
 
     def scatter_plot(self):

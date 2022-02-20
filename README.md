@@ -1,7 +1,8 @@
 # twi-lite
 
 ## Description
-**twi-lite** is a Python package that aims to make analyzing Twitter user data more convenient. It aims to provide a template to create a machine learning pipeline and high-level building blocks that allows full customization of feature selection and model evaluation based on the .
+**twi-lite** is a Python package that aims to make analyzing Twitter user data more convenient. It aims to provide a template to create a machine learning pipeline and high-level building blocks that allows full customization of feature selection and model evaluation for each step of the pipeline.
+
 
 ## Main Features
 * A ```Feature```class that stores basic user information, the hashtags and the retweets that user has used

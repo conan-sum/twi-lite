@@ -1,39 +1,36 @@
-from twilite.preprocessing.hashtag import Hashtag, Hashtags
-from twilite.preprocessing.retweet import Retweet, Retweets
-from twilite.preprocessing.user import User, Users
+from twilite.preprocessing.filter import frequency, feature
+from scipy import sparse
+import numpy as np
 
 
-class Feature:
-    def __init__(self, hashtags=True, retweets=True):
-        self.hashtags = hashtags
-        self.retweets = retweets
-        self.user_stats = Users(hashtags=hashtags, retweets=retweets)
-        if hashtags:
-            self.hashtags_list = Hashtags()
-        if retweets:
-            self.retweets_list = Retweets()
+class Matrix:
+    def __init__(self, filter_by, **kwargs):
+        self.filter_by = filter_by
+        self.user_num = kwargs.get('user_num') if 'user_num' in kwargs.keys() else 2
+        self.ft_freq = kwargs.get('ft_freq') if 'ft_freq' in kwargs.keys() else 2
+        self.ft_num = kwargs.get('ft_num') if 'ft_num' in kwargs.keys() else 1
+        self.k = kwargs.get('k') if 'k' in kwargs.keys() else 10
+        self.df = None
+        self.matrix = None
 
-    def __repr__(self):
-        return f"{self.user_stats}"
-
-    def extract(self, data):
-        user_id = data['author_id']
-        user = self.user_stats.find_user(user_id=user_id)
-        if self.hashtags:
-            try:
-                hts = data['entities']['hashtags']
-                for ht in hts:
-                    user.add_hashtag(ht['tag'].lower())
-                    self.hashtags_list.add_hashtag(ht['tag'].lower())
-            except KeyError:
-                pass
-        if self.retweets:
-            try:
-                ref_type = data['referenced_tweets'][0]['type']
-                if ref_type == 'retweeted':
-                    ref_tweet_id = data['referenced_tweets'][0]['id']
-                    user.add_retweet(ref_tweet_id)
-                    self.retweets_list.add_retweet(ref_tweet_id)
-            except KeyError:
-                pass
+    def read_df(self, df):
+        self.df = df
         return None
+
+    def filter(self):
+        if self.filter_by == 'frequency':
+            self.df = frequency(self.df, self.user_num, self.ft_freq, self.ft_num)
+        if self.filter_by == 'feature':
+            self.df = feature(self.df, self.k)
+        return None
+
+    def sparse(self):
+        df = self.df
+        df.columns = ['userid', 'feature', 'ft_count']
+        df = df.assign(uid_matrixid=df.groupby(['userid']).ngroup(), ft_matrixid=df.groupby(['feature']).ngroup())
+        output_matrix = sparse.coo_matrix(
+            (df.ft_count.values.tolist(), (df.uid_matrixid.values, df.ft_matrixid.values)))
+        user_id = np.array(
+            df[['userid', 'uid_matrixid']].groupby(['userid', 'uid_matrixid']).head(1)['userid'])
+        return output_matrix, user_id
+

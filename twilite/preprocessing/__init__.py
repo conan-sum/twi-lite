@@ -34,3 +34,19 @@ class Matrix:
             df[['userid', 'uid_matrixid']].groupby(['userid', 'uid_matrixid']).head(1)['userid'])
         return output_matrix, user_id
 
+    def export(self):
+        args = None
+        if self.filter_by == 'frequency':
+            args = {
+                'user_num': self.user_num,
+                'ft_freq': self.ft_freq,
+                'ft_num': self.ft_num,
+            }
+        if self.filter_by == 'feature':
+            args = {
+                'k': self.k
+            }
+        return {
+            'filter_by': self.filter_by,
+            'kwargs': args
+        }

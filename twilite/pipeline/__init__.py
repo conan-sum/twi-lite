@@ -3,7 +3,8 @@ import numpy as np
 
 
 class Pipeline:
-    def __init__(self, preprocess=None, transform=None, evaluate=None, database=None):
+    def __init__(self, feature, preprocess=None, transform=None, evaluate=None, database=None):
+        self.feature = feature
         self.preprocess = preprocess
         self.transform = transform
         self.evaluate = evaluate
@@ -32,13 +33,28 @@ class Pipeline:
 
     def scatter_plot(self):
         df = self.labels
-        return sns.scatterplot(x=df['xcord'], y=df['ycord'], hue=['c ' + str(x) for x in df['label']])
+        return sns.scatterplot(x=df['xcord'], y=df['ycord'],
+                               hue=['c ' + str(x) for x in df['label']])
 
     def load_config(self, config_file=None, from_db=False, **kwargs):
         pass
 
     def save_config(self, config_file=None, to_db=False):
-        pass
+        config = {
+            'preprocess': self.preprocess.export(),
+            'transform': {
+                'mapper': str(type(self.transform.mapper)).split('.')[-1][:-2],
+            },
+            'evaluate': {
+                'model': str(type(self.evaluate.model())).split('.')[-1][:-2],
+            },
+            'range_start': self.evaluate.eval_range[0],
+            'range_end': self.evaluate.eval_range[-1],
+            'best_parameter': self.best_param_
+        }
+        return config
 
     def save_labels(self):
-        pass
+        if self.labels:
+            self.database.save_to_db(feature=self.feature, df=self.labels)
+        return None

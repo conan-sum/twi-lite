@@ -1,5 +1,7 @@
 import seaborn as sns
 import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
 
 class Pipeline:

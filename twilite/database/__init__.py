@@ -1,6 +1,16 @@
+import mysql.connector
+
+
 class Storage:
-    def __init__(self, connection):
-        self.con = connection
+    def __init__(self, db, creds):
+        def connect(database):
+            return mysql.connector.connect(
+                host=creds["host"],
+                user=creds["user"],
+                passwd=creds["passwd"],
+                database=database
+            )
+        self.con = connect(db)
 
     def find_config(self):
         pass

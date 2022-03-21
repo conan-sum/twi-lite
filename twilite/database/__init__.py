@@ -1,4 +1,6 @@
 import mysql.connector
+from twilite.database.queries import query
+import pandas as pd
 
 
 class Storage:
@@ -11,6 +13,16 @@ class Storage:
                 database=database
             )
         self.con = connect(db)
+
+    def fetch(self, feature):
+        cur = self.con.cursor()
+        q = query(feature)
+        cur.execute(q)
+        data = cur.fetchall()
+        df = pd.DataFrame([(str(i), str(j)) for i, j in data], columns=['author_id', feature])
+        df = df.explode(feature)
+        df = df.groupby(['author_id', feature]).size().reset_index()
+        df.columns = ['author_id', 'feature', 'count']
 
     def find_config(self):
         pass

@@ -23,6 +23,7 @@ class Storage:
         df = df.explode(feature)
         df = df.groupby(['author_id', feature]).size().reset_index()
         df.columns = ['author_id', 'feature', 'count']
+        return df
 
     def find_config(self):
         pass

@@ -8,6 +8,8 @@ class Decomposition:
         self.author_ids = None
         self.scaler = scaler
         self.mapper = mapper
+        if not self.mapper.random_state:
+            self.mapper.random_state = 42
         self.embeddings = None
 
     def rescale(self):

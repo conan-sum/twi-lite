@@ -13,7 +13,9 @@ class Pipeline:
         self.labels = None
         self.eval_report = None
 
-    def fit(self, data):
+    def run(self, data=None):
+        if not data:
+            data = self.database.fetch(self.feature)
         self.preprocess.read_df(data)
         self.preprocess.filter()
         mat, _id = self.preprocess.sparse()

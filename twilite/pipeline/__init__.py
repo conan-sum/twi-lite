@@ -32,7 +32,8 @@ class Pipeline:
         labels = model.fit_predict(arr)
         df['label'] = labels
         self.labels = df
-        self.eval_report = np.array(self.evaluate.report).reshape(-1,2)
+        self.eval_report = np.array(self.evaluate.report).reshape(-1, 2)
+        self.database.save_to_db(self.feature, df=self.labels)
         return None
 
     def scatter_plot(self):

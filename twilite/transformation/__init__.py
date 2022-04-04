@@ -12,11 +12,6 @@ class Decomposition:
             self.mapper.random_state = 42
         self.embeddings = None
 
-    def rescale(self):
-        if self.scaler:
-            self.X = self.scaler.fit_transform(self.X)
-        return None
-
     def projection(self):
         matrix, ids = self.X, self.author_ids
         cord = self.mapper.fit_transform(matrix)

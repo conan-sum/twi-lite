@@ -5,7 +5,7 @@ warnings.filterwarnings('ignore')
 
 
 class Pipeline:
-    def __init__(self, feature, preprocess=None, transform=None, evaluate=None, database=None):
+    def __init__(self, feature, preprocess, transform, evaluate, database=None):
         self.feature = feature
         self.preprocess = preprocess
         self.transform = transform
@@ -19,11 +19,9 @@ class Pipeline:
         if not data:
             data = self.database.fetch(self.feature)
         self.preprocess.read_df(data)
-        self.preprocess.filter()
         mat, _id = self.preprocess.sparse()
         self.transform.X = mat
         self.transform.author_ids = _id
-        self.transform.rescale()
         df = self.transform.projection()
         param = self.evaluate.eval(df=df)
         self.best_param_ = param
@@ -31,15 +29,18 @@ class Pipeline:
         model = self.evaluate.model(param)
         labels = model.fit_predict(arr)
         df['label'] = labels
-        self.labels = df
+        self.labels = df.sort_value(by='label')
         self.eval_report = np.array(self.evaluate.report).reshape(-1, 2)
-        self.database.save_to_db(feature=self.feature, df=self.labels)
+        if self.database:
+            self.database.save_to_db(feature=self.feature, df=self.labels)
+        else:
+            self.labels.to_csv(f'{self.feature}_embeddings.csv')
         return None
 
     def scatter_plot(self):
         df = self.labels
         return sns.scatterplot(x=df['xcord'], y=df['ycord'],
-                               hue=['c ' + str(x) for x in df['label']])
+                               hue=['c' + str(x) for x in df['label']])
 
     def load_config(self, config_file=None, from_db=False, **kwargs):
         pass
@@ -59,7 +60,3 @@ class Pipeline:
         }
         return config
 
-    def save_labels(self):
-        if self.labels:
-            self.database.save_to_db(feature=self.feature, df=self.labels)
-        return None

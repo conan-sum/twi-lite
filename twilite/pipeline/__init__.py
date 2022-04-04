@@ -1,5 +1,6 @@
 import seaborn as sns
 import numpy as np
+import time
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -16,26 +17,34 @@ class Pipeline:
         self.eval_report = None
 
     def run(self, data=None):
+        start = time.time()
         if not data:
             data = self.database.fetch(self.feature)
         self.preprocess.read_df(data)
         mat, _id = self.preprocess.sparse()
+        print(f'[ETL 1/4] COMPLETE .......... PREPROCESS, TOTAL TIME={time.time() - start}')
+        split = time.time()
         self.transform.X = mat
         self.transform.author_ids = _id
         df = self.transform.projection()
+        print(f'[ETL 2/4] COMPLETE ...... TRANSFORMATION, TOTAL TIME={time.time() - split}')
+        split = time.time()
         param = self.evaluate.eval(df=df)
         self.best_param_ = param
         arr = df[['xcord', 'ycord']].to_numpy()
         model = self.evaluate.model(param)
         labels = model.fit_predict(arr)
         df['label'] = labels
+        print(f'[ETL 3/4] COMPLETE .... MODEL EVALUATION, TOTAL TIME={time.time() - split}')
+        split = time.time()
         self.labels = df.sort_values(by='label')
         self.eval_report = np.array(self.evaluate.report).reshape(-1, 2)
         if self.database:
             self.database.save_to_db(feature=self.feature, df=self.labels)
         else:
             self.labels.to_csv(f'{self.feature}_embeddings.csv')
-        print("process complete")
+        print(f'[ETL 4/4] COMPLETE ........... LOAD DATA, TOTAL TIME={time.time() - split}')
+        print(f"[ETL 4/4] END ......... PROCESS COMPLETE, TOTAL TIME={time.time() - start}")
         return None
 
     def scatter_plot(self):

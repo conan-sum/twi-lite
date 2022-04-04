@@ -15,7 +15,7 @@ class Decomposition:
     def projection(self):
         matrix, ids = self.X, self.author_ids
         cord = self.mapper.fit_transform(matrix)
-        data = np.array(cord)
+        data = self.scaler.fit_transform(np.array(cord))
         x, y = data.T
         output_df = pd.DataFrame(ids, columns=['author_id'])
         output_df['xcord'] = x

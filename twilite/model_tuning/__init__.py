@@ -11,6 +11,7 @@ class Validation:
     def eval(self, df):
         S = []
         arr = df[['xcord', 'ycord']].to_numpy()
+        print("evaluating cluster model")
         for i in tqdm(self.eval_range):
             labels = self.model(i).fit_predict(arr)
             score = self.metric(arr, labels)

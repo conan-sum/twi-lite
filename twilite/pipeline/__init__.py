@@ -16,16 +16,13 @@ class Pipeline:
         self.eval_report = None
 
     def run(self, data=None):
-        print("extracting data")
         if not data:
             data = self.database.fetch(self.feature)
         self.preprocess.read_df(data)
         mat, _id = self.preprocess.sparse()
-        print("transforming data")
         self.transform.X = mat
         self.transform.author_ids = _id
         df = self.transform.projection()
-        print("evaluating cluster model")
         param = self.evaluate.eval(df=df)
         self.best_param_ = param
         arr = df[['xcord', 'ycord']].to_numpy()
@@ -35,7 +32,6 @@ class Pipeline:
         self.labels = df.sort_values(by='label')
         self.eval_report = np.array(self.evaluate.report).reshape(-1, 2)
         if self.database:
-            print("loading data to database")
             self.database.save_to_db(feature=self.feature, df=self.labels)
         else:
             self.labels.to_csv(f'{self.feature}_embeddings.csv')

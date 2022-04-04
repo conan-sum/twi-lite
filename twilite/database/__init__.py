@@ -17,6 +17,7 @@ class Storage:
         self.output = connect(db+'_umap')
 
     def fetch(self, feature):
+        print("extracting data")
         cur = self.con.cursor()
         q = query(feature)
         cur.execute(q)
@@ -38,6 +39,7 @@ class Storage:
         cur.execute(f"DROP TABLE IF EXISTS {feature};")
         cur.execute(f"CREATE TABLE {feature} (author_id VARCHAR(50), xcord FLOAT(10), ycord FLOAT(10), labels INT);")
         data = df.to_numpy()
+        print("loading data into database")
         for row in tqdm(data):
             cur.execute(f"INSERT INTO {feature} VALUES (%s,%s,%s,%s);", (row[0], round(row[1], 4), round(row[2], 4), row[3]))
         self.output.commit()

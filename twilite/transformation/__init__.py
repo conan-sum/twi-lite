@@ -13,6 +13,7 @@ class Decomposition:
         self.embeddings = None
 
     def projection(self):
+        print("transforming data")
         matrix, ids = self.X, self.author_ids
         cord = self.mapper.fit_transform(matrix)
         data = self.scaler.fit_transform(np.array(cord))

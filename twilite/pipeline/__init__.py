@@ -7,7 +7,7 @@ warnings.filterwarnings('ignore')
 
 
 class Pipeline:
-    def __init__(self, feature, preprocess, transform, evaluate, database=None):
+    def __init__(self, preprocess, transform, evaluate, feature=None, database=None):
         self.feature = feature
         self.preprocess = preprocess
         self.transform = transform

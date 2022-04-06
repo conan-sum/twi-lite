@@ -1,4 +1,4 @@
-def frequency(df, user_num, ft_freq, ft_num):
+def feature(df, user_num, ft_freq, ft_num):
     df.columns = ['userid', 'feature', 'ft_count']
     df = df.groupby(['userid', 'feature'], axis=0, as_index=False).sum()
     # filter out features that have appeared in the data less than a certain times
@@ -15,7 +15,7 @@ def frequency(df, user_num, ft_freq, ft_num):
     return df
 
 
-def feature(df, k):
+def frequency(df, k):
     df.columns = ['userid', 'feature', 'ft_count']
     df = df.groupby(['userid', 'feature'], axis=0, as_index=False).sum()
     # filter out features that have appeared in the data less than a certain times

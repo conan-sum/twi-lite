@@ -17,15 +17,12 @@ class Matrix:
         self.df = df
         return None
 
-    def filter(self):
-        if self.filter_by == 'frequency':
-            self.df = frequency(self.df, self.user_num, self.ft_freq, self.ft_num)
-        if self.filter_by == 'feature':
-            self.df = feature(self.df, self.k)
-        return None
-
     def sparse(self):
         df = self.df
+        if self.filter_by == 'frequency':
+            df = frequency(self.df, self.user_num, self.ft_freq, self.ft_num)
+        if self.filter_by == 'feature':
+            df = feature(self.df, self.k)
         df.columns = ['userid', 'feature', 'ft_count']
         df = df.assign(uid_matrixid=df.groupby(['userid']).ngroup(), ft_matrixid=df.groupby(['feature']).ngroup())
         output_matrix = sparse.coo_matrix(

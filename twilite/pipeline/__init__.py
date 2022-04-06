@@ -1,11 +1,13 @@
 import seaborn as sns
 import numpy as np
+import time
 import warnings
+from joblib import logger
 warnings.filterwarnings('ignore')
 
 
 class Pipeline:
-    def __init__(self, feature, preprocess=None, transform=None, evaluate=None, database=None):
+    def __init__(self, feature, preprocess, transform, evaluate, database=None):
         self.feature = feature
         self.preprocess = preprocess
         self.transform = transform
@@ -16,29 +18,43 @@ class Pipeline:
         self.eval_report = None
 
     def run(self, data=None):
+        start = time.time()
         if not data:
             data = self.database.fetch(self.feature)
         self.preprocess.read_df(data)
-        self.preprocess.filter()
         mat, _id = self.preprocess.sparse()
+        print(f'[ETL 1/4] COMPLETE .......... PREPROCESS, TOTAL TIME={logger.short_format_time(time.time() - start)}')
+
+        split = time.time()
         self.transform.X = mat
         self.transform.author_ids = _id
-        self.transform.rescale()
         df = self.transform.projection()
+        print(f'[ETL 2/4] COMPLETE ...... TRANSFORMATION, TOTAL TIME={logger.short_format_time(time.time() - split)}')
+
+        split = time.time()
         param = self.evaluate.eval(df=df)
         self.best_param_ = param
         arr = df[['xcord', 'ycord']].to_numpy()
         model = self.evaluate.model(param)
         labels = model.fit_predict(arr)
         df['label'] = labels
-        self.labels = df
-        self.eval_report = np.array(self.evaluate.report).reshape(-1,2)
+        print(f'[ETL 3/4] COMPLETE .... MODEL EVALUATION, TOTAL TIME={logger.short_format_time(time.time() - split)}')
+
+        split = time.time()
+        self.labels = df.sort_values(by='label')
+        self.eval_report = np.array(self.evaluate.report).reshape(-1, 2)
+        if self.database:
+            self.database.save_to_db(feature=self.feature, df=self.labels)
+        else:
+            self.labels.to_csv(f'{self.feature}_embeddings.csv')
+        print(f'[ETL 4/4] COMPLETE ........... LOAD DATA, TOTAL TIME={logger.short_format_time(time.time() - split)}')
+        print(f'PROCESS COMPLETE ...................... , TOTAL TIME={logger.short_format_time(time.time() - start)}')
         return None
 
     def scatter_plot(self):
         df = self.labels
         return sns.scatterplot(x=df['xcord'], y=df['ycord'],
-                               hue=['c ' + str(x) for x in df['label']])
+                               hue=['c' + str(x) for x in df['label']])
 
     def load_config(self, config_file=None, from_db=False, **kwargs):
         pass
@@ -58,7 +74,3 @@ class Pipeline:
         }
         return config
 
-    def save_labels(self):
-        if self.labels:
-            self.database.save_to_db(feature=self.feature, df=self.labels)
-        return None

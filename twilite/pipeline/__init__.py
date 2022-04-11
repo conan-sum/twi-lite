@@ -7,7 +7,7 @@ warnings.filterwarnings('ignore')
 
 
 class Pipeline:
-    def __init__(self, feature, preprocess, transform, evaluate, database=None):
+    def __init__(self, preprocess, transform, evaluate, feature=None, database=None):
         self.feature = feature
         self.preprocess = preprocess
         self.transform = transform
@@ -17,32 +17,24 @@ class Pipeline:
         self.labels = None
         self.eval_report = None
 
-    def run(self, data=None):
+    def run(self, df=None):
         start = time.time()
-        if not data:
-            data = self.database.fetch(self.feature)
-        self.preprocess.read_df(data)
-        mat, _id = self.preprocess.sparse()
+        if not df:
+            df = self.database.fetch(self.feature)
+        mat, _id = self.preprocess.sparse(df)
         print(f'[ETL 1/4] COMPLETE .......... PREPROCESS, TOTAL TIME={logger.short_format_time(time.time() - start)}')
 
         split = time.time()
-        self.transform.X = mat
-        self.transform.author_ids = _id
-        df = self.transform.projection()
+        df = self.transform.projection(mat, _id)
         print(f'[ETL 2/4] COMPLETE ...... TRANSFORMATION, TOTAL TIME={logger.short_format_time(time.time() - split)}')
 
         split = time.time()
-        param = self.evaluate.eval(df=df)
-        self.best_param_ = param
-        arr = df[['xcord', 'ycord']].to_numpy()
-        model = self.evaluate.model(param)
-        labels = model.fit_predict(arr)
-        df['label'] = labels
+        self.evaluate.search(df)
+        df['label'] = self.evaluate.labels
         print(f'[ETL 3/4] COMPLETE .... MODEL EVALUATION, TOTAL TIME={logger.short_format_time(time.time() - split)}')
 
         split = time.time()
         self.labels = df.sort_values(by='label')
-        self.eval_report = np.array(self.evaluate.report).reshape(-1, 2)
         if self.database:
             self.database.save_to_db(feature=self.feature, df=self.labels)
         else:
@@ -51,17 +43,16 @@ class Pipeline:
         print(f'PROCESS COMPLETE ...................... , TOTAL TIME={logger.short_format_time(time.time() - start)}')
         return None
 
-    def scatter_plot(self):
+    def scatter_plot(self, labels=True):
         df = self.labels
-        return sns.scatterplot(x=df['xcord'], y=df['ycord'],
-                               hue=['c' + str(x) for x in df['label']])
+        if labels:
+            return sns.scatterplot(x=df['xcord'], y=df['ycord'],
+                                   hue=['c' + str(x) for x in df['label']])
+        return sns.scatterplot(x=df['xcord'], y=df['ycord'])
 
-    def load_config(self, config_file=None, from_db=False, **kwargs):
-        pass
-
-    def save_config(self, config_file=None, to_db=False):
+    def config(self, config_file=None, to_db=False):
         config = {
-            'preprocess': self.preprocess.export(),
+            'preprocess': self.preprocess.config(),
             'transform': {
                 'mapper': str(type(self.transform.mapper)).split('.')[-1][:-2],
             },

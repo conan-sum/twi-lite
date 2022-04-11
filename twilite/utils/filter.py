@@ -1,4 +1,7 @@
-def frequency(df, user_num, ft_freq, ft_num):
+def feature(df, kwargs):
+    user_num = kwargs.get('user_num') if 'user_num' in kwargs.keys() else 2
+    ft_freq = kwargs.get('ft_freq') if 'ft_freq' in kwargs.keys() else 2
+    ft_num = kwargs.get('ft_num') if 'ft_num' in kwargs.keys() else 1
     df.columns = ['userid', 'feature', 'ft_count']
     df = df.groupby(['userid', 'feature'], axis=0, as_index=False).sum()
     # filter out features that have appeared in the data less than a certain times
@@ -15,7 +18,8 @@ def frequency(df, user_num, ft_freq, ft_num):
     return df
 
 
-def feature(df, k):
+def frequency(df, kwargs):
+    k = kwargs.get('k') if 'k' in kwargs.keys() else 10
     df.columns = ['userid', 'feature', 'ft_count']
     df = df.groupby(['userid', 'feature'], axis=0, as_index=False).sum()
     # filter out features that have appeared in the data less than a certain times

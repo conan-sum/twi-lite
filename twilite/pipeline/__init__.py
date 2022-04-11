@@ -25,23 +25,16 @@ class Pipeline:
         print(f'[ETL 1/4] COMPLETE .......... PREPROCESS, TOTAL TIME={logger.short_format_time(time.time() - start)}')
 
         split = time.time()
-        self.transform.X = mat
-        self.transform.author_ids = _id
-        df = self.transform.projection()
+        df = self.transform.projection(mat, _id)
         print(f'[ETL 2/4] COMPLETE ...... TRANSFORMATION, TOTAL TIME={logger.short_format_time(time.time() - split)}')
 
         split = time.time()
-        param = self.evaluate.eval(df=df)
-        self.best_param_ = param
-        arr = df[['xcord', 'ycord']].to_numpy()
-        model = self.evaluate.model(param)
-        labels = model.fit_predict(arr)
-        df['label'] = labels
+        self.evaluate.search(df)
+        df['label'] = self.evaluate.labels
         print(f'[ETL 3/4] COMPLETE .... MODEL EVALUATION, TOTAL TIME={logger.short_format_time(time.time() - split)}')
 
         split = time.time()
         self.labels = df.sort_values(by='label')
-        self.eval_report = np.array(self.evaluate.report).reshape(-1, 2)
         if self.database:
             self.database.save_to_db(feature=self.feature, df=self.labels)
         else:

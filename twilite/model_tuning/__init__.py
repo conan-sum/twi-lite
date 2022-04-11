@@ -1,6 +1,4 @@
-
-
-class Validation:
+class GridSearch:
     def __init__(self, model, eval_range, metric):
         self.model = model
         self.eval_range = eval_range

@@ -51,17 +51,16 @@ class Pipeline:
         print(f'PROCESS COMPLETE ...................... , TOTAL TIME={logger.short_format_time(time.time() - start)}')
         return None
 
-    def scatter_plot(self):
+    def scatter_plot(self, labels=True):
         df = self.labels
-        return sns.scatterplot(x=df['xcord'], y=df['ycord'],
-                               hue=['c' + str(x) for x in df['label']])
+        if labels:
+            return sns.scatterplot(x=df['xcord'], y=df['ycord'],
+                                   hue=['c' + str(x) for x in df['label']])
+        return sns.scatterplot(x=df['xcord'], y=df['ycord'])
 
-    def load_config(self, config_file=None, from_db=False, **kwargs):
-        pass
-
-    def save_config(self, config_file=None, to_db=False):
+    def config(self, config_file=None, to_db=False):
         config = {
-            'preprocess': self.preprocess.export(),
+            'preprocess': self.preprocess.config(),
             'transform': {
                 'mapper': str(type(self.transform.mapper)).split('.')[-1][:-2],
             },

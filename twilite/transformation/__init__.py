@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-class Decomposition:
+class MatrixFactorization:
     def __init__(self, scaler=None, mapper=None):
         self.X = None
         self.author_ids = None

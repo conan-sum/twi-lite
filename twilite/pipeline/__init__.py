@@ -17,12 +17,11 @@ class Pipeline:
         self.labels = None
         self.eval_report = None
 
-    def run(self, data=None):
+    def run(self, df=None):
         start = time.time()
-        if not data:
-            data = self.database.fetch(self.feature)
-        self.preprocess.read_df(data)
-        mat, _id = self.preprocess.sparse()
+        if not df:
+            df = self.database.fetch(self.feature)
+        mat, _id = self.preprocess.sparse(df)
         print(f'[ETL 1/4] COMPLETE .......... PREPROCESS, TOTAL TIME={logger.short_format_time(time.time() - start)}')
 
         split = time.time()

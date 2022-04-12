@@ -55,23 +55,29 @@ class Storage:
         con.close()
         return df
 
-    def find_config(self):
-        pass
+    def fetch_labels(self, table):
+        con = self.connect()
+        cur = con.cursor()
+        cur.execute(f"SELECT * FROM {table} WHERE config_id=(SELECT id FROM config WHERE feature='{table}' ORDER BY id DESC LIMIT 1);")
+        data = cur.fetchall()
+        df = pd.DataFrame(data, columns=['config_id', 'u_id', 'xcord', 'ycord', 'label'])
+        df.drop(labels='config_id', axis=1, inplace=True)
+        con.close()
+        return df
 
-    def store_config(self, feature):
+    def execute(self, query):
+        con = self.connect()
+        cur = con.cursor()
+        cur.execute(query)
+        data = cur.fetchall()
+        return data
+
+    def save_to_db(self, feature, df):
         con = self.connect()
         cur = con.cursor()
         cur.execute("INSERT INTO config (feature) VALUE (%s);", (feature,))
         cur.execute("SELECT id FROM config ORDER BY ID DESC LIMIT 1;")
         config_id = cur.fetchone()
-        con.commit()
-        con.close()
-        return config_id[0]
-
-    def save_to_db(self, feature, df):
-        config_id = self.store_config(feature)
-        con = self.connect()
-        cur = con.cursor()
         data = df.to_numpy()
         for row in data:
             cur.execute(f"INSERT INTO {feature} VALUES (%s,%s,%s,%s,%s);",

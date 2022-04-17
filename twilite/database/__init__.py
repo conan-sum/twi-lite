@@ -65,6 +65,13 @@ class Storage:
         con.close()
         return df
 
+    def fetch_annotations(self):
+        con = self.connect()
+        cur = con.cursor()
+        cur.execute("SELECT author_id FROM annotations;")
+        data = cur.fetchall()
+        return [i[0] for i in data]
+
     def execute(self, query):
         con = self.connect()
         cur = con.cursor()

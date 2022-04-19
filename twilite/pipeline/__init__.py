@@ -7,12 +7,12 @@ warnings.filterwarnings('ignore')
 
 
 class Pipeline:
-    def __init__(self, preprocess, transform, evaluate, feature=None, database=None):
-        self.feature = feature
-        self.preprocess = preprocess
-        self.transform = transform
+    def __init__(self, steps, evaluate=None, feature=None, database=None):
+        self.steps = steps
         self.evaluate = evaluate
+        self.feature = feature
         self.database = database
+        self.index = None
         self.best_param_ = None
         self.labels = None
         self.eval_report = None
@@ -21,11 +21,12 @@ class Pipeline:
         start = time.time()
         if not df:
             df = self.database.fetch(self.feature)
-        mat, _id = self.preprocess.sparse(df)
+        self.index = df[df.columns[0]].to_numpy()
         print(f'[ETL 1/4] COMPLETE .......... PREPROCESS, TOTAL TIME={logger.short_format_time(time.time() - start)}')
 
         split = time.time()
-        df = self.transform.projection(mat, _id)
+        for i in self.steps:
+            df = i.transform(df)
         print(f'[ETL 2/4] COMPLETE ...... TRANSFORMATION, TOTAL TIME={logger.short_format_time(time.time() - split)}')
 
         split = time.time()

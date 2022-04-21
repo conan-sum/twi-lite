@@ -13,6 +13,9 @@ class Storage:
             'user_rt_uid': "SELECT author_id, ref_author_id FROM retweeted;",
         }
 
+    def __repr__(self):
+        return f"database={self.database}"
+
     def connect(self):
         return mysql.connector.connect(
             host=self.creds["host"],
@@ -87,10 +90,8 @@ class Storage:
         cur.execute("INSERT INTO config (feature) VALUE (%s);", (feature,))
         cur.execute("SELECT id FROM config ORDER BY ID DESC LIMIT 1;")
         config_id = cur.fetchone()[0]
-        print(config_id)
         data = df.to_numpy()
         for row in data:
-            print(row)
             cur.execute(f"INSERT INTO {feature} VALUES (%s,%s,%s,%s,%s);",
                         (config_id, row[0], round(row[1], 4), round(row[2], 4), row[3]))
         con.commit()

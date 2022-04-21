@@ -5,6 +5,10 @@ class Model:
         self.best_result = None
         self.best_model = None
 
+    def __repr__(self):
+        model_name = type(self.model()).__name__
+        return f'{model_name}()'
+
     def evaluate(self, df, metric):
         S = []
         arr = df[['xcord', 'ycord']].to_numpy()
@@ -25,6 +29,12 @@ class GridSearch:
         self.results = []
         self.best_model = None
         self.labels = None
+
+    def __repr__(self):
+        if self.best_model:
+            model_name = type(self.best_model).__name__
+            return f'GridSearch(best_model={model_name}, metric={self.metric})'
+        return f'GridSearch(models={self.models}, metric={self.metric.__name__})'
 
     def search(self, df):
         for i in self.models:

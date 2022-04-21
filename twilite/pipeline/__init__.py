@@ -1,5 +1,4 @@
 import seaborn as sns
-import numpy as np
 import time
 import warnings
 from joblib import logger
@@ -13,16 +12,34 @@ class Pipeline:
         self.feature = feature
         self.database = database
         self.index = None
-        self.best_param_ = None
         self.labels = None
-        self.eval_report = None
+
+    def __repr__(self):
+        newline = '\n'
+        output = f''
+        output += 'PIPELINE CONFIGURATION\n'
+        output += f'{newline}'
+        output += 'FEATURE\n'
+        output += f'feature={self.feature}\n'
+        output += f'{newline}'
+        output += 'PREPROCESSING\n'
+        for i in self.steps:
+            output += f'{i}\n'
+        output += f'{newline}'
+        if self.evaluate:
+            output += 'PREDICTIVE MODELING\n'
+            output += f'{self.evaluate}\n'
+            output += f'{newline}'
+        output += 'DATABASE\n'
+        output += f'{self.database}'
+        return output
 
     def run(self, df=None):
         start = time.time()
         if not df:
             df = self.database.fetch(self.feature)
         self.index = df[df.columns[0]].to_numpy()
-        print(f'[ETL 1/4] COMPLETE .......... PREPROCESS, TOTAL TIME={logger.short_format_time(time.time() - start)}')
+        print(f'[ETL 1/4] COMPLETE ............. EXTRACT, TOTAL TIME={logger.short_format_time(time.time() - start)}')
 
         split = time.time()
         for i in self.steps:
@@ -51,18 +68,4 @@ class Pipeline:
                                    hue=['c' + str(x) for x in df['label']])
         return sns.scatterplot(x=df['xcord'], y=df['ycord'])
 
-    def config(self, config_file=None, to_db=False):
-        config = {
-            'preprocess': self.preprocess.config(),
-            'transform': {
-                'mapper': str(type(self.transform.mapper)).split('.')[-1][:-2],
-            },
-            'evaluate': {
-                'model': str(type(self.evaluate.model())).split('.')[-1][:-2],
-            },
-            'range_start': self.evaluate.eval_range[0],
-            'range_end': self.evaluate.eval_range[-1],
-            'best_parameter': self.best_param_
-        }
-        return config
 

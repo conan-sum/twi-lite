@@ -4,10 +4,13 @@ import pandas as pd
 
 
 class FeatureFilter:
-    def __init__(self, user_num, ft_freq, ft_num):
+    def __init__(self, user_num=2, ft_freq=2, ft_num=1):
         self.user_num = user_num
         self.ft_freq = ft_freq
         self.ft_num = ft_num
+
+    def __repr__(self):
+        return f"FeatureFilter(user_num={self.user_num}, ft_freq={self.ft_freq}, ft_num={self.ft_num})"
 
     def transform(self, df):
         df.columns = ['userid', 'feature', 'ft_count']
@@ -30,6 +33,9 @@ class FrequencyFilter:
     def __init__(self, k=10):
         self.k = k
 
+    def __repr__(self):
+        return f"FrequencyFilter(k={self.k})"
+
     def transform(self, df):
         df.columns = ['userid', 'feature', 'ft_count']
         df = df.groupby(['userid', 'feature'], axis=0, as_index=False).sum()
@@ -42,12 +48,17 @@ class FrequencyFilter:
 
 
 class Decomposition:
-    def __init__(self, scalar=None, mapper=None):
-        self.scalar = scalar
+    def __init__(self, scaler=None, mapper=None):
+        self.scaler = scaler
         self.mapper = mapper
         if not self.mapper.random_state:
             self.mapper.random_state = 42
         self.embeddings = None
+
+    def __repr__(self):
+        if self.scaler:
+            return f"Decomposition(scalar={self.scaler}, mapper={self.mapper})"
+        return f"Decomposition(mapper={self.mapper})"
 
     def transform(self, df):
         df.columns = ['uid', 'feature', 'ft_count']
@@ -57,8 +68,8 @@ class Decomposition:
         u_id = np.array(
             df[['uid', 'uid_matrixid']].groupby(['uid', 'uid_matrixid']).head(1)['uid'])
         cord = self.mapper.fit_transform(output_matrix)
-        if self.scalar:
-            data = self.scalar.fit_transform(np.array(cord))
+        if self.scaler:
+            data = self.scaler.fit_transform(np.array(cord))
         else:
             data = np.array(cord)
         x, y = data.T

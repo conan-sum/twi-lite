@@ -56,9 +56,11 @@ class Decomposition:
         self.embeddings = None
 
     def __repr__(self):
+        mapper_name = self.mapper.__class__.__name__
         if self.scaler:
-            return f"Decomposition(scalar={self.scaler}, mapper={self.mapper})"
-        return f"Decomposition(mapper={self.mapper})"
+            scaler_name = self.scaler.__class__.__name__
+            return f"Decomposition(scalar={scaler_name}, mapper={mapper_name})"
+        return f"Decomposition(mapper={mapper_name})"
 
     def transform(self, df):
         df.columns = ['uid', 'feature', 'ft_count']

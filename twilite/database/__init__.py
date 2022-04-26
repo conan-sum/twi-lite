@@ -30,7 +30,7 @@ class Storage:
         cur.execute("CREATE TABLE IF NOT EXISTS config (id INT AUTO_INCREMENT PRIMARY KEY, feature VARCHAR(20));")
         for i in self.queries.keys():
             cur.execute(f"CREATE TABLE IF NOT EXISTS {i} "
-                        f"(config_id INT, feature VARCHAR(32), xcord FLOAT(10), ycord FLOAT(10), labels INT, "
+                        f"(config_id INT, feature VARCHAR(50), xcord FLOAT(10), ycord FLOAT(10), labels INT, "
                         f"FOREIGN KEY (config_id) REFERENCES config(id));")
         con.commit()
         con.close()

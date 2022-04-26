@@ -6,8 +6,8 @@ class Model:
         self.best_model = None
 
     def __repr__(self):
-        model_name = type(self.model()).__name__
-        return f'{model_name}()'
+        model_name = self.model().__class__.__name__
+        return f'{model_name}'
 
     def evaluate(self, df, metric):
         S = []

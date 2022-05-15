@@ -6,6 +6,43 @@ warnings.filterwarnings('ignore')
 
 
 class Pipeline:
+    """
+    Parameters
+    ----------
+    steps: list()
+        A list of steps to use for preprocessing the data
+
+    evaluate: twilite.GridSearch, default = None
+        Used for model evaluation and clustering, this parameter takes in a twilite GridSearch class that contains
+
+    feature: str, default = None
+        'user_ht': user to hashtag mapping
+
+        'ht_user': hashtag to user mapping
+
+        'user_rt_tid': user to retweeted tweet id mapping
+
+        'user_rt_uid': user to retweeted user id mapping
+
+    database: twilite.Storage, default = None
+        Used for extracting data from MySQL database and stores the generated data in a separtate table
+
+    Attributes
+    ----------
+    index: numpy array of shape (df_rows,)
+        a numpy array of elements in the first column of the dataframe, this could be user_ids or hashtags
+
+    labels: pandas dataframe with columns ('u_id', 'xcord', 'ycord', 'label')
+        'u_id': the independent variable used to generate the embeddings with respect to
+
+        'xcord': the x-coordinate of the embedding
+
+        'ycord': the y-coordinate of the embedding
+
+        'label': the cluster this point belongs to assigned by the clustering model
+
+    """
+
     def __init__(self, steps, evaluate=None, feature=None, database=None):
         self.steps = steps
         self.evaluate = evaluate
@@ -35,6 +72,13 @@ class Pipeline:
         return output
 
     def run(self, df=None):
+        """
+        Parameters
+        ----------
+        df: pandas dataframe with columns ('u_id', 'feature', 'count')
+
+        """
+
         start = time.time()
         if not df:
             df = self.database.fetch(self.feature)

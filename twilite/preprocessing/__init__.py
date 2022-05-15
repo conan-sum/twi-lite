@@ -4,6 +4,23 @@ import pandas as pd
 
 
 class FeatureFilter:
+    """
+    Parameters
+    ----------
+    user_num: int, default = 2
+        minimum number of each user in the dataset
+
+    ft_freq: int, default = 2
+        minimum frequency of each feature in the dataset
+
+    ft_num: int, default = 1
+        minimum number of usage per feature per user
+
+    Attributes
+    ----------
+    None
+
+    """
     def __init__(self, user_num=2, ft_freq=2, ft_num=1):
         self.user_num = user_num
         self.ft_freq = ft_freq
@@ -30,6 +47,17 @@ class FeatureFilter:
 
 
 class FrequencyFilter:
+    """
+    Parameters
+    ----------
+    k: int, default = 10
+        Features that appear in the dataset at least k tiimes
+
+    Attributes
+    ----------
+    None
+
+    """
     def __init__(self, k=10):
         self.k = k
 
@@ -48,6 +76,19 @@ class FrequencyFilter:
 
 
 class Decomposition:
+    """
+    Parameters
+    ----------
+    scaler: sklearn function
+        Scaling function to use for scaling the embeddings
+    mapper: umap-learn or sklearn function
+        Dimensionality reduction used to generate the embeddings
+
+    Attributes
+    ----------
+    None
+
+    """
     def __init__(self, scaler=None, mapper=None):
         self.scaler = scaler
         self.mapper = mapper

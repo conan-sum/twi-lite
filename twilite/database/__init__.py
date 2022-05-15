@@ -3,6 +3,21 @@ import pandas as pd
 
 
 class Storage:
+    """
+    Parameters
+    ----------
+    creds: json object
+        Credentials used to access MySQL database
+
+    database: str
+        The name of the database to use
+
+    Attributes
+    ----------
+    queries: str
+        SQL query used to extract data from the database
+
+    """
     def __init__(self, db, creds):
         self.creds = creds
         self.database = db

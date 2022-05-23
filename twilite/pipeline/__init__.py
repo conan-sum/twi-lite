@@ -6,11 +6,12 @@ warnings.filterwarnings('ignore')
 
 
 class Pipeline:
-    def __init__(self, steps, evaluate=None, feature=None, database=None):
-        self.steps = steps
-        self.evaluate = evaluate
+    def __init__(self, extract, transform, load, feature=None, storage=None):
+        self.steps = extract
+        self.transform = transform
+        self.load = load
         self.feature = feature
-        self.database = database
+        self.storage = storage
         self.index = None
         self.labels = None
 

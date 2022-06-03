@@ -39,12 +39,12 @@ ht_user = Pipeline(
         ParameterEstimation(models=models, metric=silhouette_score)
     ],
     source=read_query,
-    destination=to_database,
+    target=to_database,
     database=Storage(db='blm2', creds=creds)
 )
 
 
 if __name__ == '__main__':
-    ht_user.run()
+    ht_user.run(verbose=True)
 
 

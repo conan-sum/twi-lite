@@ -17,24 +17,9 @@ class Pipeline:
         self.df = None
 
     def __repr__(self):
-        newline = '\n'
-        output = f''
-        output += 'PIPELINE CONFIGURATION\n'
-        output += f'{newline}'
-        output += 'FEATURE\n'
-        output += f'feature={self.feature}\n'
-        output += f'{newline}'
-        output += 'PREPROCESSING\n'
-        for i in self.steps:
-            output += f'{i}\n'
-        output += f'{newline}'
-        if self.evaluate:
-            output += 'PREDICTIVE MODELING\n'
-            output += f'{self.evaluate}\n'
-            output += f'{newline}'
-        output += 'DATABASE\n'
-        output += f'{self.database}'
-        return output
+        return f"Pipeline(feature={self.feature}, " \
+               f"steps={self.steps}, source={self.source.__name__}, " \
+               f"target={self.target.__name__}, database={self.database})"
 
     def run(self, verbose=False, **kwargs):
         start = time.time()

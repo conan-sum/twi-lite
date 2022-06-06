@@ -1,23 +1,3 @@
-"""
-from twilite.pipeline import Pipeline
-from twilite.transformations import FeatureFilter, Manifold, ParameterEstimation
-from twilite.dependencies import read_query, to_database
-from twilite.database import Storage
-
-Pipeline(
-    feature = 'ht_user'
-    steps = [
-        #twilite.transformations
-        FeatureFilter(),
-        Manifold(scaler=StandardScaler(), mapper=UMAP(n_components=2)),
-        ParameterEstimation()
-    ],
-    source = read_query(sql), #twilite.dependencies
-    destination = to_database("BLM2") #twilite.dependencies
-    database (optional) = Storage() #twilite.database
-)
-"""
-
 from twilite.pipeline import Pipeline
 from twilite.transformations import FeatureFilter, Manifold, ParameterEstimation, Model
 from twilite.dependencies import read_query, to_database
@@ -45,6 +25,7 @@ ht_user = Pipeline(
 
 
 if __name__ == '__main__':
-    ht_user.run(verbose=True)
+    #ht_user.run(verbose=True)
+    print(ht_user)
 
 

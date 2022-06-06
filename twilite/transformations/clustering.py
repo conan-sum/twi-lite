@@ -5,7 +5,7 @@ class Model:
 
     def __repr__(self):
         model_name = self.model().__class__.__name__
-        return f'{model_name}'
+        return f'Model(model={model_name})'
 
     def evaluate(self, df, metric):
         S = []
@@ -31,8 +31,8 @@ class ParameterEstimation:
         metric_name = self.metric.__name__
         if self.best_model:
             model_name = self.best_model.__class__.__name__
-            return f'GridSearch(best_model={model_name}, metric={metric_name}, score={self.best_result})'
-        return f'GridSearch(models={self.models}, metric={metric_name})'
+            return f'ParameterEstimation(best_model={model_name}, metric={metric_name}, score={self.best_result})'
+        return f'ParameterEstimation(models={self.models}, metric={metric_name})'
 
     def fit(self, df):
         for i in self.models:

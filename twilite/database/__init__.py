@@ -13,7 +13,7 @@ class Storage:
         self.queries = queries
 
     def __repr__(self):
-        return f"database={self.database}"
+        return f"Storage(database={self.database})"
 
     def connect(self):
         return mysql.connector.connect(

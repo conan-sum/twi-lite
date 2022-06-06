@@ -15,8 +15,8 @@ class Manifold:
         mapper_name = self.mapper.__class__.__name__
         if self.scaler:
             scaler_name = self.scaler.__class__.__name__
-            return f"Decomposition(scalar={scaler_name}, mapper={mapper_name})"
-        return f"Decomposition(mapper={mapper_name})"
+            return f"Manifold(scalar={scaler_name}, mapper={mapper_name})"
+        return f"Manifold(mapper={mapper_name})"
 
     def fit(self, df):
         df.columns = ['uid', 'feature', 'ft_count']

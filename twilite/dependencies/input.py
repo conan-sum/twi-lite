@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def read_query(kwargs):
+def find_by_feature(kwargs):
     db = kwargs['db']
     df = db.fetch(kwargs['feature'])
     return df

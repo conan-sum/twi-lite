@@ -1,6 +1,6 @@
 from twilite.pipeline import Pipeline
 from twilite.transformations import FeatureFilter, Manifold, ParameterEstimation, Model
-from twilite.dependencies import read_query, to_database
+from twilite.dependencies import find_by_feature, find_by_id, to_database
 from twilite.database import Storage
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
@@ -18,7 +18,20 @@ ht_user = Pipeline(
         Manifold(scaler=StandardScaler(), mapper=UMAP(n_components=2)),
         ParameterEstimation(models=models, metric=silhouette_score)
     ],
-    source=read_query,
+    source=find_by_feature,
+    target=to_database,
+    database=Storage(db='blm2', creds=creds)
+)
+
+
+ht_user_subcluster = Pipeline(
+    feature='ht_user',
+    steps=[
+        FeatureFilter(user_num=20),
+        Manifold(scaler=StandardScaler(), mapper=UMAP(n_components=2)),
+        ParameterEstimation(models=models, metric=silhouette_score)
+    ],
+    source=find_by_id,
     target=to_database,
     database=Storage(db='blm2', creds=creds)
 )

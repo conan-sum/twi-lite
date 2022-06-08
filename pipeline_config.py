@@ -25,7 +25,7 @@ ht_user = Pipeline(
 
 
 if __name__ == '__main__':
-    #ht_user.run(verbose=True)
+    #ht_user.run()
     print(ht_user)
 
 

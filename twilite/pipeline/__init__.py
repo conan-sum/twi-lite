@@ -21,32 +21,31 @@ class Pipeline:
                f"steps={self.steps}, source={self.source.__name__}, " \
                f"target={self.target.__name__}, database={self.database})"
 
-    def run(self, verbose=False, **kwargs):
+    def run(self, **kwargs):
         start = time.time()
         if self.database:
             kwargs['db'] = self.database
             self.database.create_all()
         kwargs['feature'] = self.feature
+        if 'ids' in kwargs.keys():
+            kwargs['feature'] = self.feature+'_subcluster'
         df = self.source(kwargs)
-        if verbose:
-            print(f'FETCH DATA FROM SOURCE COMPLETE, TIME={logger.short_format_time(time.time() - start)}')
+        print(f'FETCH DATA FROM SOURCE COMPLETE, TIME={logger.short_format_time(time.time() - start)}')
 
         split = time.time()
         total = len(self.steps)
         current = 1
         for i in self.steps:
             df = i.fit(df)
-            if verbose:
-                print(f'[TRANSFORMATION {current}/{total}] COMPLETE, TIME={logger.short_format_time(time.time() - split)}')
+            print(f'[TRANSFORMATION {current}/{total}] COMPLETE, TIME={logger.short_format_time(time.time() - split)}')
             current += 1
 
         split = time.time()
         self.df = df.sort_values(by='label')
         self.target(self.df, kwargs)
-        if verbose:
-            print(f'STORE DATA TO TARGET COMPLETE, TIME={logger.short_format_time(time.time() - split)}')
-            print('-------------------------------------------')
-            print(f'PROCESS COMPLETE, TOTAL TIME={logger.short_format_time(time.time() - start)}')
+        print(f'STORE DATA TO TARGET COMPLETE, TIME={logger.short_format_time(time.time() - split)}')
+        print('-------------------------------------------')
+        print(f'PROCESS COMPLETE, TOTAL TIME={logger.short_format_time(time.time() - start)}')
         return None
 
     def scatter_plot(self, labels=True):

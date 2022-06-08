@@ -13,9 +13,9 @@ default_queries = {
         'ht_user': "SELECT hashtag, author_id FROM hash_link;",
         'user_rt_tid': "SELECT author_id, ref_tweet_id FROM retweeted;",
         'user_rt_uid': "SELECT author_id, ref_author_id FROM retweeted;",
-        'labels': "SELECT * FROM {table} WHERE config_id=(SELECT id FROM config WHERE feature='{table}' "
-                  "ORDER BY id DESC LIMIT 1);"
     },
+    'labels': "SELECT * FROM {table} WHERE config_id=(SELECT id FROM config WHERE feature='{table}' "
+              "ORDER BY id DESC LIMIT 1);",
     'store': {
         'config_id': "INSERT INTO config (feature) VALUE ({feature});",
         'fetch_id': "SELECT id FROM config ORDER BY ID DESC LIMIT 1;",

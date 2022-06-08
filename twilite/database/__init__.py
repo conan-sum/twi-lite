@@ -30,6 +30,7 @@ class Storage:
         cur.execute(sql['db_config'])
         for i in self.queries.keys():
             cur.execute(sql['embeddings'].format(i=i))
+            cur.execute(sql['embeddings']+'_subcluster'.format(i=i))
         con.commit()
         con.close()
         return None
